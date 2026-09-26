@@ -16,7 +16,9 @@ const SYSTEM_RECORDS = {
     contacts: [
       { name: "Jane M. Carter", roleType: "Owner", phone: "314-555-0110", address: "123 Main St, St. Louis, MO" },
       { name: "Robert Carter", roleType: "Beneficiary", phone: "314-555-0199", address: "" }
-    ]
+    ],
+    poaDetail: { agentName: "", ownerName: "", beneficiaryPower: "" },
+    poaRole: { agentName: "", powerOfAttorneyFor: "", ssn: "", status: "", effectiveDate: "", notes: "" }
   },
   "ACC-12045": {
     clientName: "Robert T. Ellis", dob: "1948-06-15", address: "9 Birch Ln, Peoria",
@@ -30,7 +32,7 @@ const SYSTEM_RECORDS = {
         allocationMethod: "Percentage", allocationValue: 100, contingents: [] }
     ] },
     docs: [
-      { docType: "POA", name: "Power of Attorney agreement", date: "07/02/2026", status: "Filed" },
+      { docType: "POA", name: "Power of Attorney agreement", date: "07/02/2026", status: "Completed" },
       { docType: "TOD", name: "Transfer on Death Agreement - signed", date: "09/01/2026", status: "Pending review" }
     ],
     notepad: [
@@ -39,7 +41,9 @@ const SYSTEM_RECORDS = {
     contacts: [
       { name: "Robert T. Ellis", roleType: "Owner", phone: "309-555-0142", address: "9 Birch Ln, Peoria, IL" },
       { name: "Susan Ellis-Marks", roleType: "POA / Beneficiary", phone: "309-555-0187", address: "" }
-    ]
+    ],
+    poaDetail: { agentName: "Susan Ellis-Marks", ownerName: "Robert T. Ellis", beneficiaryPower: "Yes — authorized to designate or change beneficiary" },
+    poaRole: { agentName: "Susan Ellis-Marks", powerOfAttorneyFor: "Robert T. Ellis", ssn: "XXX-XX-9021", status: "Authorised", effectiveDate: "07/02/2026", notes: "Full scope POA, exp 01/2028." }
   },
   "ACC-10567": {
     clientName: "David L. Nguyen", dob: "1978-09-03", address: "45 Oak Ave, Kansas City",
@@ -63,7 +67,9 @@ const SYSTEM_RECORDS = {
     ],
     contacts: [
       { name: "David L. Nguyen", roleType: "Owner / Trustee", phone: "816-555-0121", address: "45 Oak Ave, Kansas City, MO" }
-    ]
+    ],
+    poaDetail: { agentName: "", ownerName: "", beneficiaryPower: "" },
+    poaRole: { agentName: "", powerOfAttorneyFor: "", ssn: "", status: "", effectiveDate: "", notes: "" }
   },
   "ACC-11890": {
     clientName: "Patricia A. Owens", dob: "1952-11-27", address: "78 River Rd, Springfield",
@@ -81,14 +87,18 @@ const SYSTEM_RECORDS = {
     notepad: [],
     contacts: [
       { name: "Patricia A. Owens", roleType: "Owner", phone: "217-555-0133", address: "78 River Rd, Springfield, IL" }
-    ]
+    ],
+    poaDetail: { agentName: "", ownerName: "", beneficiaryPower: "" },
+    poaRole: { agentName: "", powerOfAttorneyFor: "", ssn: "", status: "", effectiveDate: "", notes: "" }
   },
   "BLANK": {
     clientName: "", dob: "", address: "", stateCode: "", accountType: "Individual Brokerage",
     maritalStatus: "", status: "Pending",
     ownersRoles: [ { name: "", role: "Owner" } ],
     beneficiaryDetail: { primaries: [] },
-    docs: [], notepad: [], contacts: []
+    docs: [], notepad: [], contacts: [],
+    poaDetail: { agentName: "", ownerName: "", beneficiaryPower: "" },
+    poaRole: { agentName: "", powerOfAttorneyFor: "", ssn: "", status: "Authorised", effectiveDate: "", notes: "" }
   }
 };
 

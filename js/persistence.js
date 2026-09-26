@@ -76,6 +76,7 @@ function reloadFromSharedRecord() {
     document.getElementById('acctNumInput').value = currentRecordData.accountNumber || id;
     updateAcctBox();
     renderSystemPane();
+    renderOwnersRolesPane();
     setMainTab(currentMainTab);
   } catch (e) {
     statusEl.textContent = 'Reload failed — stored data was corrupted.';

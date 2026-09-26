@@ -10,8 +10,6 @@ function addContingentRow(pi) {
   renderSystemPane();
 }
 function removeContingentRow(pi,ci) { currentRecordData.beneficiaryDetail.primaries[pi].contingents.splice(ci,1); renderSystemPane(); }
-function addOwnerRoleRow() { currentRecordData.ownersRoles.push({ name:'', role:'Power of Attorney' }); renderSystemPane(); }
-function removeOwnerRoleRow(i) { currentRecordData.ownersRoles.splice(i,1); renderSystemPane(); }
 
 function recordRowHtml(b, pathPrefix, showContingentsCol, contingentCount) {
   const allocSelect = '<select class="sf-cell-select" onchange="' + pathPrefix + '.allocationMethod = this.value; renderSystemPane();">' +
@@ -44,7 +42,8 @@ function renderSystemPane() {
   '</div>';
 
   html += '<div class="sf-tabs"><div class="sf-tab' + (rec.status==='Pending'?' active':'') + '" onclick="setRecordStatus(\'Pending\')">Pending TOD Beneficiaries</div>' +
-    '<div class="sf-tab' + (rec.status==='Approved'?' active':'') + '" onclick="setRecordStatus(\'Approved\')">Approved TOD Beneficiaries</div></div>';
+    '<div class="sf-tab' + (rec.status==='Approved'?' active':'') + '" onclick="setRecordStatus(\'Approved\')">Approved TOD Beneficiaries</div>' +
+    '<div class="sf-tab' + (rec.status==='Completed'?' active':'') + '" onclick="setRecordStatus(\'Completed\')">Completed</div></div>';
 
   html += '<div class="sf-statusbar">Status: <b>' + rec.status + '</b>' +
     '<button class="sf-btn-dec" disabled title="Decorative only in this prototype">Resend/Reprint</button>' +
@@ -72,19 +71,12 @@ function renderSystemPane() {
       html += '<tr class="totals"><td>Totals:</td><td></td><td></td><td></td><td>' + allocationTotalLabel(p.contingents) + '</td><td></td></tr>';
       html += '</tbody></table></div>';
     });
-  } else {
+  } else if (rec.status === 'Approved') {
     html += '<div class="sf-approved-note">Approved-vs-Pending comparison is deferred for now — not yet part of this prototype.</div>';
+  } else {
+    html += '<div class="sf-approved-note">Document review completed. This case is closed out — beneficiaries are finalized and no further action is pending.</div>';
   }
 
-  html += '<div class="sf-owners-panel"><div class="sf-section-title">Owners &amp; Roles (' + rec.ownersRoles.length + ') <button class="sf-add-row" onclick="addOwnerRoleRow()">+ Add person</button></div>';
-  rec.ownersRoles.forEach((o, oi) => {
-    html += '<div class="sf-owner-row"><div class="sf-owner-square"></div><div class="sf-owner-fields">' +
-      '<input class="sf-cell-input name-input" value="' + o.name + '" oninput="currentRecordData.ownersRoles[' + oi + '].name = this.value">' +
-      '<div class="sf-owner-role-line">Role: <select class="sf-cell-select" onchange="currentRecordData.ownersRoles[' + oi + '].role = this.value">' +
-        ['Owner','Power of Attorney','Trusted Contact','3rd Party Signer for Document'].map(r => '<option' + (o.role===r?' selected':'') + '>' + r + '</option>').join('') + '</select>' +
-        (o.role !== 'Owner' ? '<button class="sf-row-rm" onclick="removeOwnerRoleRow(' + oi + ')">×</button>' : '') + '</div></div></div>';
-  });
-  html += '</div>';
   pane.innerHTML = html;
 }
 

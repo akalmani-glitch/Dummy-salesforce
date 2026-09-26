@@ -24,6 +24,7 @@ function loadCase(caseId) {
   updateAcctBox();
   setMainTab(currentMainTab);
   renderSystemPane();
+  renderOwnersRolesPane();
   document.getElementById('viewBtn').classList.add('active');
   document.getElementById('editBtn').classList.remove('active');
   document.getElementById('uploadStatus').textContent = '';

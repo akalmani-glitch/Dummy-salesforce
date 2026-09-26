@@ -38,7 +38,7 @@
     </div>
   </div>
 
-  <div class="cols">
+  <div class="cols-3">
     <div class="card">
       <div class="main-tabs" id="mainTabs">
         <div class="main-tab" data-tab="docs" onclick="setMainTab('docs')">Client Docs</div>
@@ -52,6 +52,12 @@
         <div id="tabBeneficiary"><div id="systemPane"></div></div>
         <div id="tabContacts" style="display:none"></div>
       </div>
+    </div>
+
+    <div class="card owners-card">
+      <h2>Owners &amp; Roles</h2>
+      <p class="hint">Always visible here regardless of which tab is open — not restricted to Beneficiary.</p>
+      <div id="ownersRolesPane"></div>
     </div>
 
     <div class="card form-card">
@@ -98,6 +104,7 @@
 <script src="js/persistence.js"></script>
 <script src="js/tabs-main.js"></script>
 <script src="js/beneficiary-record.js"></script>
+<script src="js/owners-roles.js"></script>
 <script src="js/form-pane.js"></script>
 <script src="js/review.js"></script>
 <script src="js/init.js"></script>
