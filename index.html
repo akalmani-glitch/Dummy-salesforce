@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beneficiary Review Assistant</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="sf-topbar"><div class="sf-square"></div><span id="topbarLabel">Financial Account · Salesforce — Work</span></div>
+<div class="sf-breadcrumb">
+  <div class="sf-badge">FA</div> Salesforce Desktop &nbsp;›&nbsp; Financial Accounts &nbsp;›&nbsp; <b id="breadcrumbName">—</b>
+  <div class="fa-field">For Financial Advisor: <input id="faNameInput" value="Advisor, Sample T."></div>
+</div>
+<div class="wrap">
+  <div class="masthead">
+    <h1>Beneficiary review assistant</h1>
+    <span class="tag">Prototype — multi-tab record clone</span>
+  </div>
+  <p class="sub">The left panel is a simplified clone of the Salesforce desktop, with tabs for the sections your review process actually touches. Beneficiary is fully wired to the rule engine; the other three are working starting points to build on.</p>
+
+  <div class="top-controls">
+    <div class="ctrl"><label for="caseSelect">Account</label><select id="caseSelect"></select></div>
+    <div class="ctrl"><label for="reviewDate">Review date (simulates "today")</label><input type="text" id="reviewDate" class="review-date" value="09/25/2026"></div>
+  </div>
+  <div class="top-controls">
+    <div class="ctrl"><label for="acctNumInput">Account number (save key)</label><input type="text" id="acctNumInput" style="width:150px" oninput="currentRecordData.accountNumber = this.value.toUpperCase(); updateAcctBox();"></div>
+    <div class="ctrl"><button class="sf-add-row" id="saveBtn" onclick="saveToSharedRecord()" style="border:1px solid var(--line);padding:8px 14px;border-radius:6px;">💾 Save locally</button></div>
+    <div class="ctrl"><button class="sf-add-row" id="reloadBtn" onclick="reloadFromSharedRecord()" style="border:1px solid var(--line);padding:8px 14px;border-radius:6px;">⟲ Reload local record</button></div>
+    <div class="ctrl"><span class="upload-status" id="dbStatus">Checking local browser storage…</span></div>
+  </div>
+
+  <div class="acct-box">
+    <div class="acct-square"></div>
+    <div>
+      <div class="acct-main" id="acctBoxName">—</div>
+      <div class="acct-sub" id="acctBoxSub">—</div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <div class="main-tabs" id="mainTabs">
+        <div class="main-tab" data-tab="docs" onclick="setMainTab('docs')">Client Docs</div>
+        <div class="main-tab" data-tab="notepad" onclick="setMainTab('notepad')">Account Notepad</div>
+        <div class="main-tab active" data-tab="beneficiary" onclick="setMainTab('beneficiary')">Beneficiary</div>
+        <div class="main-tab" data-tab="contacts" onclick="setMainTab('contacts')">Account Details &amp; Client Info</div>
+      </div>
+      <div class="tab-panel-inner">
+        <div id="tabDocs" style="display:none"></div>
+        <div id="tabNotepad" style="display:none"></div>
+        <div id="tabBeneficiary"><div id="systemPane"></div></div>
+        <div id="tabContacts" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="card form-card">
+      <div class="form-head">
+        <h2>Incoming form</h2>
+        <div class="mode-toggle">
+          <button id="viewBtn" onclick="setEditMode(false)">View</button>
+          <button id="editBtn" onclick="setEditMode(true)">Edit</button>
+        </div>
+      </div>
+      <p class="hint">Top fields default to a read-only view (as if extracted); beneficiary tables are always editable</p>
+      <div class="upload-row">
+        <label class="upload-label">
+          📄 Upload form (PDF / image)
+          <input type="file" accept=".pdf,image/*" style="display:none" onchange="handleUpload(event)">
+        </label>
+        <span class="upload-status" id="uploadStatus"></span>
+      </div>
+      <div id="formPane"></div>
+    </div>
+  </div>
+
+  <div class="runbar">
+    <button class="run" onclick="runReview()">Run review</button>
+  </div>
+
+  <div class="verdict-shell" id="verdictShell">
+    <div class="verdict-head">
+      <div class="verdict-pill" id="verdictPill"></div>
+      <div class="caseid" id="verdictCase"></div>
+    </div>
+    <div class="card" id="itemsCard" style="padding: 4px 18px;"></div>
+  </div>
+
+  <div class="footnote">
+    <b>This is a standalone file — no Claude dependency.</b> It runs entirely in your browser using local storage, so saved accounts persist across reloads on this device/browser, but are NOT shared with other people or other machines. To make this a genuinely multi-user shared tool (what "sharable" really requires), it needs a real backend — a hosted database and API this page talks to instead of localStorage. Common low-effort options: Firebase or Supabase (free tier, you create the account); or a small custom API on your organization's own infrastructure if you have engineering support. Once a backend exists, the same backend can be wrapped as an MCP connector so a future Claude conversation using the beneficiary-review skill could read and write this client record directly — that's the path to genuine automation we discussed earlier, rather than manually relaying data between this tool and a chat.<br><br>
+    Client Docs, Account Notepad, and Account Details & Client Info remain working shells (add/edit/remove rows, no rules attached) pending your input on the doc-type-to-form mapping and notepad-to-authorization linking. Beneficiary tab rules: Section A (Scan Title, Document Date, State Code) plus Section B (DOB, SSN/TIN, Relationship, allocation method/value, contingent count, added/removed beneficiaries, signer vs. Owners &amp; Roles).
+  </div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/persistence.js"></script>
+<script src="js/tabs-main.js"></script>
+<script src="js/beneficiary-record.js"></script>
+<script src="js/form-pane.js"></script>
+<script src="js/review.js"></script>
+<script src="js/init.js"></script>
+</body>
+</html>
