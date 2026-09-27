@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
     await ensureSchema();
 
     if (req.method === 'GET') {
-      const { rows } = await sql`SELECT data FROM accounts WHERE id = ${id}`;
+      const rows = await sql`SELECT data FROM accounts WHERE id = ${id}`;
       if (!rows.length) { res.status(404).json({ error: 'Account not found', id }); return; }
       res.status(200).json(rows[0].data);
       return;

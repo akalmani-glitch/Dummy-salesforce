@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
 
   try {
     await ensureSchema();
-    const { rows } = await sql`
+    const rows = await sql`
       SELECT id, client_name AS "clientName", updated_at AS "updatedAt"
       FROM accounts
       ORDER BY updated_at DESC
