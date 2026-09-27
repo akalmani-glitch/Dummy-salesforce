@@ -25,9 +25,9 @@
   </div>
   <div class="top-controls">
     <div class="ctrl"><label for="acctNumInput">Account number (save key)</label><input type="text" id="acctNumInput" style="width:150px" oninput="currentRecordData.accountNumber = this.value.toUpperCase(); updateAcctBox();"></div>
-    <div class="ctrl"><button class="sf-add-row" id="saveBtn" onclick="saveToSharedRecord()" style="border:1px solid var(--line);padding:8px 14px;border-radius:6px;">💾 Save locally</button></div>
-    <div class="ctrl"><button class="sf-add-row" id="reloadBtn" onclick="reloadFromSharedRecord()" style="border:1px solid var(--line);padding:8px 14px;border-radius:6px;">⟲ Reload local record</button></div>
-    <div class="ctrl"><span class="upload-status" id="dbStatus">Checking local browser storage…</span></div>
+    <div class="ctrl"><button class="sf-add-row" id="saveBtn" onclick="saveToSharedRecord()" style="border:1px solid var(--line);padding:8px 14px;border-radius:6px;">💾 Save record</button></div>
+    <div class="ctrl"><button class="sf-add-row" id="reloadBtn" onclick="reloadFromSharedRecord()" style="border:1px solid var(--line);padding:8px 14px;border-radius:6px;">⟲ Reload record</button></div>
+    <div class="ctrl"><span class="upload-status" id="dbStatus">Connecting to server…</span></div>
   </div>
 
   <div class="acct-box">
@@ -93,7 +93,7 @@
   </div>
 
   <div class="footnote">
-    <b>This is a standalone file — no Claude dependency.</b> It runs entirely in your browser using local storage, so saved accounts persist across reloads on this device/browser, but are NOT shared with other people or other machines. To make this a genuinely multi-user shared tool (what "sharable" really requires), it needs a real backend — a hosted database and API this page talks to instead of localStorage. Common low-effort options: Firebase or Supabase (free tier, you create the account); or a small custom API on your organization's own infrastructure if you have engineering support. Once a backend exists, the same backend can be wrapped as an MCP connector so a future Claude conversation using the beneficiary-review skill could read and write this client record directly — that's the path to genuine automation we discussed earlier, rather than manually relaying data between this tool and a chat.<br><br>
+    <b>Saved records are stored server-side in a real database</b> (via /api/accounts), not browser localStorage — they persist across devices and are readable by anyone with the account URL, by design, since this tool only ever holds dummy test data. The GET endpoints require no authentication, so an external AI assistant or script can fetch an account's JSON directly. Only this page's own Save button can write; there is no external write endpoint. The same read API is the path to wrapping this as an MCP connector later, so a Claude conversation using the beneficiary-review skill could read this client record directly.<br><br>
     Client Docs, Account Notepad, and Account Details & Client Info remain working shells (add/edit/remove rows, no rules attached) pending your input on the doc-type-to-form mapping and notepad-to-authorization linking. Beneficiary tab rules: Section A (Scan Title, Document Date, State Code) plus Section B (DOB, SSN/TIN, Relationship, allocation method/value, contingent count, added/removed beneficiaries, signer vs. Owners &amp; Roles).
   </div>
 </div>

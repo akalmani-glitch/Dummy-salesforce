@@ -1,84 +1,88 @@
+const API_BASE = '/api/accounts';
+
 function sanitizeAccountId(raw) {
   return (raw || '').toUpperCase().replace(/[^A-Z0-9_\-.~:@+]/g, '').slice(0, 190);
 }
 
-function initPersistence() {
+async function initPersistence() {
   const statusEl = document.getElementById('dbStatus');
+  statusEl.textContent = 'Connecting to server…';
   try {
-    localStorage.setItem('__probe__', '1');
-    localStorage.removeItem('__probe__');
-    statusEl.textContent = 'Local browser storage connected — saved records stay on this device/browser only, not shared with other users.';
+    const res = await fetch(API_BASE);
+    if (!res.ok) throw new Error('bad status');
+    statusEl.textContent = 'Connected to the server database — saved records are stored centrally and readable by anyone with the account URL.';
   } catch (e) {
-    localStorageOk = false;
-    statusEl.textContent = 'Browser storage unavailable (private/incognito mode, or disabled) — running session-only.';
-    document.getElementById('saveBtn').disabled = true;
-    document.getElementById('reloadBtn').disabled = true;
-    return;
+    statusEl.textContent = 'Could not reach the server database — check your connection and try again.';
   }
   refreshAccountList();
 }
 
-function getAccountIndex() {
-  try { return JSON.parse(localStorage.getItem('br_account_index') || '[]'); } catch (e) { return []; }
-}
-function setAccountIndex(list) {
-  try { localStorage.setItem('br_account_index', JSON.stringify(list)); } catch (e) { /* ignore */ }
-}
-
-function refreshAccountList() {
+async function refreshAccountList() {
   const group = document.getElementById('savedAccountsGroup');
   group.innerHTML = '';
-  const ids = getAccountIndex();
-  if (!ids.length) {
+  try {
+    const res = await fetch(API_BASE);
+    if (!res.ok) throw new Error('bad status');
+    const list = await res.json();
+    if (!list.length) {
+      const opt = document.createElement('option');
+      opt.disabled = true;
+      opt.textContent = '(no saved accounts yet — save one below)';
+      group.appendChild(opt);
+      return;
+    }
+    list.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = 'ACCT:' + item.id;
+      opt.textContent = item.id + ' — ' + (item.clientName || '(unnamed)');
+      group.appendChild(opt);
+    });
+  } catch (e) {
     const opt = document.createElement('option');
     opt.disabled = true;
-    opt.textContent = '(no saved accounts yet — save one below)';
+    opt.textContent = '(could not load saved accounts)';
     group.appendChild(opt);
-    return;
   }
-  ids.forEach(id => {
-    let data = {};
-    try { data = JSON.parse(localStorage.getItem('br_account:' + id) || '{}'); } catch (e) { /* ignore */ }
-    const opt = document.createElement('option');
-    opt.value = 'ACCT:' + id;
-    opt.textContent = id + ' — ' + (data.clientName || '(unnamed)');
-    group.appendChild(opt);
-  });
 }
 
-function saveToSharedRecord() {
+async function saveToSharedRecord() {
   const statusEl = document.getElementById('dbStatus');
-  if (!localStorageOk) { statusEl.textContent = 'Browser storage unavailable — cannot save.'; return; }
   const id = sanitizeAccountId(currentRecordData.accountNumber);
   if (!id) { statusEl.textContent = 'Enter an account number before saving.'; return; }
   currentRecordData.accountNumber = id;
   document.getElementById('acctNumInput').value = id;
+  statusEl.textContent = 'Saving…';
   try {
-    localStorage.setItem('br_account:' + id, JSON.stringify(currentRecordData));
-    const idx = getAccountIndex();
-    if (!idx.includes(id)) { idx.push(id); setAccountIndex(idx); }
-    statusEl.textContent = 'Saved locally (' + id + ') at ' + new Date().toLocaleTimeString() + '. This device/browser only.';
+    const res = await fetch(API_BASE + '/' + encodeURIComponent(id), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(currentRecordData)
+    });
+    if (!res.ok) throw new Error('save failed');
+    statusEl.textContent = 'Saved to server (' + id + ') at ' + new Date().toLocaleTimeString() + '.';
     refreshAccountList();
   } catch (e) {
-    statusEl.textContent = 'Save failed — browser storage may be full or disabled.';
+    statusEl.textContent = 'Save failed — server unreachable or rejected the request.';
   }
 }
 
-function reloadFromSharedRecord() {
+async function reloadFromSharedRecord() {
   const statusEl = document.getElementById('dbStatus');
   const id = sanitizeAccountId(currentRecordData.accountNumber);
   if (!id) { statusEl.textContent = 'No account number set to reload.'; return; }
-  const raw = localStorage.getItem('br_account:' + id);
-  if (!raw) { statusEl.textContent = 'No local record saved yet for ' + id + '.'; return; }
+  statusEl.textContent = 'Loading…';
   try {
-    currentRecordData = JSON.parse(raw);
-    statusEl.textContent = 'Reloaded local record (' + id + '). Unsaved edits were discarded.';
+    const res = await fetch(API_BASE + '/' + encodeURIComponent(id));
+    if (res.status === 404) { statusEl.textContent = 'No server record found for ' + id + '.'; return; }
+    if (!res.ok) throw new Error('load failed');
+    currentRecordData = await res.json();
+    statusEl.textContent = 'Reloaded server record (' + id + '). Unsaved edits were discarded.';
     document.getElementById('acctNumInput').value = currentRecordData.accountNumber || id;
     updateAcctBox();
     renderSystemPane();
     renderOwnersRolesPane();
     setMainTab(currentMainTab);
   } catch (e) {
-    statusEl.textContent = 'Reload failed — stored data was corrupted.';
+    statusEl.textContent = 'Reload failed — server unreachable.';
   }
 }

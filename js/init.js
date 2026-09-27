@@ -1,13 +1,19 @@
-function loadCase(caseId) {
+async function loadCase(caseId) {
   if (caseId.startsWith('ACCT:')) {
     const id = caseId.slice(5);
-    const raw = localStorage.getItem('br_account:' + id);
-    if (raw) {
-      try { currentRecordData = JSON.parse(raw); } catch (e) { currentRecordData = JSON.parse(JSON.stringify(SYSTEM_RECORDS.BLANK)); }
-      document.getElementById('dbStatus').textContent = 'Loaded local record: ' + id + '.';
-    } else {
+    document.getElementById('dbStatus').textContent = 'Loading ' + id + '…';
+    try {
+      const res = await fetch(API_BASE + '/' + encodeURIComponent(id));
+      if (res.ok) {
+        currentRecordData = await res.json();
+        document.getElementById('dbStatus').textContent = 'Loaded server record: ' + id + '.';
+      } else {
+        currentRecordData = JSON.parse(JSON.stringify(SYSTEM_RECORDS.BLANK));
+        document.getElementById('dbStatus').textContent = 'No server record found for ' + id + ' — starting blank.';
+      }
+    } catch (e) {
       currentRecordData = JSON.parse(JSON.stringify(SYSTEM_RECORDS.BLANK));
-      document.getElementById('dbStatus').textContent = 'No local record found for ' + id + ' — starting blank.';
+      document.getElementById('dbStatus').textContent = 'Could not reach the server — starting blank.';
     }
     if (!currentRecordData.accountNumber) currentRecordData.accountNumber = id;
     currentFormData = JSON.parse(JSON.stringify(FORM_SCENARIOS.BLANK));
@@ -44,7 +50,7 @@ Object.keys(SYSTEM_RECORDS).forEach(id => {
 select.appendChild(templatesGroup);
 const savedAccountsGroup = document.createElement('optgroup');
 savedAccountsGroup.id = 'savedAccountsGroup';
-savedAccountsGroup.label = 'Saved local accounts (this browser)';
+savedAccountsGroup.label = 'Saved accounts (server)';
 select.appendChild(savedAccountsGroup);
 select.addEventListener('change', () => loadCase(select.value));
 loadCase(select.value);
